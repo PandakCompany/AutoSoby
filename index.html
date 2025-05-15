@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pemesanan Tiket Kapal</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+
+
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: cadetblue;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1, h2, h3, h6 {
+            text-align: center;
+        }
+
+        label {
+            display: block;
+            margin: 10px 0 5px;
+        }
+
+        input, select {
+            width: 96%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #218838;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        #confirmation {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            border-radius: 5px;
+        }
+
+    </style>
+
+</head>
+<body>
+    <div class="container">
+        <h1>Pemesanan Tiket Kapal KM.AUTO SOBY</h1>
+        <form id="ticketForm">
+            <label for="name">Nama:</label>
+            <input type="text" id="name" name="name" required>
+
+            <label for="address">Alamat:</label>
+            <input type="text" id="address" name="address" required>
+
+            <label for="phoneNumber">Nomor Telepon/WA:</label>
+            <input type="text" id="phoneNumber" name="phoneNumber" required>
+
+            <label for="time">Jam/Pukul:</label>
+            <input type="time" id="time" name="time" required>
+
+            <label for="departureDate">Tanggal Keberangkatan:</label>
+            <input type="date" id="departureDate" name="departureDate" required>
+
+            <label for="destination">Tujuan:</label>
+            <select id="destination" name="destination" required>
+                <option value="">Pilih Tujuan</option>
+                <option value="Luwuk">Luwuk</option>
+                <option value="Leme-Leme">Leme-Leme</option>
+            </select>
+
+            <label for="price">Harga Tiket:</label>
+            <input type="number" id="price" name="price" required>
+
+            <button type="submit">Pesan Tiket</button>
+
+            <h3>Nomor Rekening: 1234567890 (BANK ABC)</h3>
+            <h3>Nomor Telepon/WA Admin: 0812-3456-7890</h3>
+            <h5>Catatan: Hasil dari konfirmasi pemesanan dan bukti pembayaran di Screnshoot dan di kirim secara bersamaan di Nomor WA Admin </h5>
+            <div class="footer">
+                <h6>@CopyRightDYumai</h6>
+            </div>
+        </form>
+
+        <div id="confirmation" class="hidden"></div>
+    </div>
+
+    <script>
+        const MAX_PASSENGERS_PER_DAY = 100;
+
+        function getBookings() {
+            return JSON.parse(localStorage.getItem("bookings") || "[]");
+        }
+
+        function saveBooking(booking) {
+            const bookings = getBookings();
+            bookings.push(booking);
+            localStorage.setItem("bookings", JSON.stringify(bookings));
+        }
+
+        document.getElementById("ticketForm").addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const name = document.getElementById('name').value;
+            const address = document.getElementById('address').value;
+            const phoneNumber = document.getElementById('phoneNumber').value;
+            const time = document.getElementById('time').value;
+            const departureDate = document.getElementById('departureDate').value;
+            const destination = document.getElementById('destination').value;
+            const price = document.getElementById('price').value;
+
+            const bookings = getBookings();
+            const bookingsForDate = bookings.filter(b => b.departureDate === departureDate);
+
+            if (bookingsForDate.length >= MAX_PASSENGERS_PER_DAY) {
+                alert(`Maaf, kuota penumpang untuk tanggal ${departureDate} sudah penuh.`);
+                return;
+            }
+
+            const booking = { name, address, phoneNumber, time, departureDate, destination, price };
+            saveBooking(booking);
+            
+
+            const confirmation = document.getElementById('confirmation');
+            confirmation.classList.remove('hidden');
+            confirmation.innerHTML = `
+                <h2>Konfirmasi Pemesanan Tiket KM.AUTO SOBY</h2>
+                <p><strong>Nama:</strong> ${name}</p>
+                <p><strong>Alamat:</strong> ${address}</p>
+                <p><strong>Nomor Telepon/WA:</strong> ${phoneNumber}</p>
+                <p><strong>Jam Keberangkatan:</strong> ${time}</p>
+                <p><strong>Tanggal Keberangkatan:</strong> ${departureDate}</p>
+                <p><strong>Tujuan:</strong> ${destination}</p>
+                <p><strong>Harga Tiket:</strong> ${price}</p>
+            `;
+
+            document.getElementById("ticketForm").reset();
+        });
+    </script>
+</body>
+</html>
